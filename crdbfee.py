@@ -135,10 +135,10 @@ class CRDBFeeCalculator:
         print("┌─────────────────────────────────────────┐")
         print("│           CRDB Fee Calculator           │")
         print("├─────────────────────────────────────────┤")
-        print(f"│ 📊 Fees/Charges: {fees_total:>8.2f} {self.currency} │")
-        print(f"│ 🏛️  VAT Total:    {vat_total:>8.2f} {self.currency} │")
+        print(f"│ 📊 Fees/Charges: {fees_total:>8.2f} {self.currency}")
+        print(f"│ 🏛️  VAT Total:    {vat_total:>8.2f} {self.currency}")
         print("├─────────────────────────────────────────┤")
-        print(f"│ 💰 Total Amount:  {total_amount:>8.2f} {self.currency} │")
+        print(f"│ 💰 Total Amount:  {total_amount:>8.2f} {self.currency}")
         print("└─────────────────────────────────────────┘")
         print(f"💱 Detected currency: {self.currency}")
 
