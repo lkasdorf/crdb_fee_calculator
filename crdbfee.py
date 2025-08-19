@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-CRDB Fee Calculator - Kommandozeilen-Tool zur Berechnung von Fees und VAT
-aus Kontoauszügen im Excel-Format.
+CRDB Fee Calculator - Command line tool for calculating fees and VAT
+from account statements in Excel format.
 """
 
 import pandas as pd
@@ -13,30 +13,30 @@ from typing import Optional, Tuple
 
 
 class CRDBFeeCalculator:
-    """Hauptklasse für die Berechnung von Fees und VAT aus CRDB Kontoauszügen."""
+    """Main class for calculating fees and VAT from CRDB account statements."""
     
     FEE_KEYWORDS = "charge|commission|fee|levy|fund transfer"
     
     def __init__(self, file_path: str):
         self.file_path = file_path
         self.df = None
-        self.currency = "USD"  # Standardwährung
+        self.currency = "USD"  # Default currency
         
     def find_header_row(self, df: pd.DataFrame) -> int:
-        """Findet die Zeile mit den Spaltenüberschriften."""
+        """Finds the row with column headers."""
         for i, row in df.iterrows():
             if any(isinstance(cell, str) and "date" in cell.lower() for cell in row):
                 return i
         return 0
     
     def parse_amount(self, val) -> Optional[float]:
-        """Parst Beträge und entfernt Tausendertrennzeichen."""
+        """Parses amounts and removes thousand separators."""
         if pd.isna(val):
             return None
         val = str(val).strip()
         if val in ["", "nan", "None"]:
             return None
-        # Tausendertrennzeichen entfernen
+        # Remove thousand separators
         val = val.replace(",", "")
         try:
             return float(val)
@@ -44,21 +44,21 @@ class CRDBFeeCalculator:
             return None
     
     def detect_currency(self, df: pd.DataFrame) -> str:
-        """Erkennt die Währung aus den Daten."""
-        # Suche nach Währung in den Spaltennamen und ersten Zeilen
+        """Detects the currency from the data."""
+        # Search for currency in column names and first rows
         currency_patterns = {
             'USD': ['usd', 'dollar', '$', 'us'],
             'TZS': ['tzs', 'shilling', 'tsh', 'tz']
         }
         
-        # Suche in Spaltennamen
+        # Search in column names
         for col in df.columns:
             col_lower = str(col).lower()
             for currency, patterns in currency_patterns.items():
                 if any(pattern in col_lower for pattern in patterns):
                     return currency
         
-        # Suche in den ersten Datenzeilen
+        # Search in first data rows
         for _, row in df.head(10).iterrows():
             for cell in row:
                 if pd.notna(cell):
@@ -67,7 +67,7 @@ class CRDBFeeCalculator:
                         if any(pattern in cell_str for pattern in patterns):
                             return currency
         
-        # Suche nach spezifischen Währungssymbolen in den Daten
+        # Search for specific currency symbols in the data
         for _, row in df.head(20).iterrows():
             for cell in row:
                 if pd.notna(cell):
@@ -77,79 +77,83 @@ class CRDBFeeCalculator:
                     elif any(symbol in cell_str for symbol in ['TSH', 'TZS', 'Sh']):
                         return 'TZS'
         
-        # Fallback: Standardwährung
+        # Fallback: Default currency
         return "USD"
     
     def load_data(self) -> bool:
-        """Lädt und bereitet die Excel-Datei vor."""
+        """Loads and prepares the Excel file."""
         try:
-            # Datei laden
+            # Load file
             df0 = pd.read_excel(self.file_path, dtype=str)
             header_idx = self.find_header_row(df0)
             
             self.df = pd.read_excel(self.file_path, skiprows=header_idx, dtype=str)
             
-            # Erste Datenzeile als Kopf
+            # First data row as header
             self.df.columns = self.df.iloc[0]
             self.df = self.df.drop(0).reset_index(drop=True)
             
-            # Einheitliche Spaltennamen (wie bei CRDB-Exporten)
+            # Standard column names (as in CRDB exports)
             self.df.columns = ["Posting Date", "Details", "Value Date", "Debit", "Credit", "Book Balance"]
             
-            # Beträge parsen
+            # Parse amounts
             self.df["Debit"] = self.df["Debit"].apply(self.parse_amount)
             self.df["Credit"] = self.df["Credit"].apply(self.parse_amount)
             self.df["__details_lc"] = self.df["Details"].astype(str).str.lower()
             
-            # Währung erkennen
+            # Detect currency
             self.currency = self.detect_currency(self.df)
             
             return True
             
         except Exception as e:
-            print(f"Fehler beim Laden der Datei: {e}", file=sys.stderr)
+            print(f"Error loading file: {e}", file=sys.stderr)
             return False
     
     def calculate_fees_and_vat(self) -> Tuple[float, float]:
-        """Berechnet die Gesamtbeträge für Fees und VAT."""
+        """Calculates the total amounts for fees and VAT."""
         if self.df is None:
             return 0.0, 0.0
         
-        # VAT und Fees filtern
+        # Filter VAT and fees
         vat_df = self.df[self.df["__details_lc"].str.contains("vat", na=False)]
         fees_df = self.df[
             self.df["__details_lc"].str.contains(self.FEE_KEYWORDS, na=False) & 
             ~self.df["__details_lc"].str.contains("vat", na=False)
         ]
         
-        # Summen berechnen
+        # Calculate sums
         fees_total = fees_df["Debit"].sum(skipna=True) or 0.0
         vat_total = vat_df["Debit"].sum(skipna=True) or 0.0
         
         return fees_total, vat_total
     
     def print_results(self, fees_total: float, vat_total: float):
-        """Gibt die Ergebnisse in einem schönen Format aus."""
+        """Prints the results in a nice format."""
         total_amount = fees_total + vat_total
+        
+        # Calculate proper spacing for currency alignment
+        currency_width = len(self.currency)
+        amount_width = 18  # Fixed width for amount + currency
         
         print("╔══════════════════════════════════════════════════════════════╗")
         print("║                    CRDB Fee Calculator                      ║")
         print("╠══════════════════════════════════════════════════════════════╣")
-        print(f"║  📊  Fees/Charges: {fees_total:>15.2f} {self.currency:<3}               ║")
-        print(f"║  🏛️   VAT Total:    {vat_total:>15.2f} {self.currency:<3}               ║")
+        print(f"║  📊  Fees/Charges: {fees_total:>15.2f} {self.currency:<3}                ║")
+        print(f"║  🏛️   VAT Total:    {vat_total:>15.2f} {self.currency:<3}                ║")
         print("╠══════════════════════════════════════════════════════════════╣")
-        print(f"║  💰  Total Amount:  {total_amount:>15.2f} {self.currency:<3}               ║")
+        print(f"║  💰  Total Amount:  {total_amount:>15.2f} {self.currency:<3}                ║")
         print("╚══════════════════════════════════════════════════════════════╝")
-        print(f"💱 Erkannte Währung: {self.currency}")
+        print(f"💱 Detected currency: {self.currency}")
 
 
 def main():
-    """Hauptfunktion für das Kommandozeilen-Tool."""
+    """Main function for the command line tool."""
     parser = argparse.ArgumentParser(
-        description="CRDB Fee Calculator - Berechnet Fees und VAT aus Kontoauszügen",
+        description="CRDB Fee Calculator - Calculates fees and VAT from account statements",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Beispiele:
+Examples:
   crdbfee statement.xlsx
   crdbfee /path/to/statement.xlsx
   crdbfee --help
@@ -158,7 +162,7 @@ Beispiele:
     
     parser.add_argument(
         "file",
-        help="Pfad zur Excel-Datei mit dem Kontoauszug"
+        help="Path to Excel file with account statement"
     )
     
     parser.add_argument(
@@ -169,17 +173,17 @@ Beispiele:
     
     args = parser.parse_args()
     
-    # Prüfe ob Datei existiert
+    # Check if file exists
     if not os.path.exists(args.file):
-        print(f"Fehler: Datei '{args.file}' existiert nicht.", file=sys.stderr)
+        print(f"Error: File '{args.file}' does not exist.", file=sys.stderr)
         sys.exit(1)
     
-    # Prüfe ob es eine Excel-Datei ist
+    # Check if it's an Excel file
     if not args.file.lower().endswith(('.xlsx', '.xls')):
-        print(f"Fehler: Datei '{args.file}' ist keine Excel-Datei.", file=sys.stderr)
+        print(f"Error: File '{args.file}' is not an Excel file.", file=sys.stderr)
         sys.exit(1)
     
-    # Berechne Fees und VAT
+    # Calculate fees and VAT
     calculator = CRDBFeeCalculator(args.file)
     
     if not calculator.load_data():

@@ -1,115 +1,115 @@
 # CRDB Fee Calculator
 
-Ein Kommandozeilen-Tool zur Berechnung von Fees und VAT aus CRDB Kontoauszügen im Excel-Format.
+A command line tool for calculating fees and VAT from CRDB account statements in Excel format.
 
 ## Features
 
-- 🚀 Einfache Kommandozeilen-Bedienung
-- 📊 Automatische Erkennung von Fees/Charges
-- 🏛️ VAT-Berechnung
-- 💱 **Automatische Währungserkennung (USD/TZS)**
-- 💰 Unterstützung für verschiedene Währungen
-- 🎨 Schöne, formatierte Ausgabe
-- 📁 Unterstützt .xlsx und .xls Dateien
+- 🚀 Simple command line interface
+- 📊 Automatic detection of fees/charges
+- 🏛️ VAT calculation
+- 💱 **Automatic currency detection (USD/TZS)**
+- 💰 Support for different currencies
+- 🎨 Beautiful, formatted output
+- 📁 Supports .xlsx and .xls files
 
 ## Installation
 
-### Voraussetzungen
+### Requirements
 
-- Linux-System
-- Python 3.7 oder höher
+- Linux system
+- Python 3.7 or higher
 - pip3
 
-### Schnellinstallation
+### Quick Installation
 
-1. Repository klonen oder herunterladen
-2. Installationsskript ausführbar machen:
+1. Clone or download repository
+2. Make installation script executable:
    ```bash
    chmod +x install.sh
    ```
-3. Installation ausführen:
+3. Run installation:
    ```bash
    ./install.sh
    ```
 
-Das Tool wird automatisch in `/usr/local/bin` installiert und ist damit von überall verfügbar.
+The tool will be automatically installed in `/usr/local/bin` and will be available from anywhere.
 
-### Manuelle Installation
+### Manual Installation
 
-1. Abhängigkeiten installieren:
+1. Install dependencies:
    ```bash
    pip3 install -r requirements.txt
    ```
 
-2. Skript ausführbar machen und in PATH kopieren:
+2. Make script executable and copy to PATH:
    ```bash
    chmod +x crdbfee.py
    sudo cp crdbfee.py /usr/local/bin/crdbfee
    ```
 
-## Verwendung
+## Usage
 
-### Grundlegende Verwendung
+### Basic Usage
 
 ```bash
 crdbfee statement.xlsx
 ```
 
-### Hilfe anzeigen
+### Show Help
 
 ```bash
 crdbfee --help
 ```
 
-### Version anzeigen
+### Show Version
 
 ```bash
 crdbfee --version
 ```
 
-## Beispielausgabe
+## Example Output
 
-### USD Ausgabe
+### USD Output
 ```
 ╔══════════════════════════════════════════════════════════════╗
 ║                    CRDB Fee Calculator                      ║
 ╠══════════════════════════════════════════════════════════════╣
-║  📊  Fees/Charges:          125.50 USD                    ║
-║  🏛️   VAT Total:             25.10 USD                    ║
+║  📊  Fees/Charges:          125.50 USD                     ║
+║  🏛️   VAT Total:             25.10 USD                     ║
 ╠══════════════════════════════════════════════════════════════╣
-║  💰  Total Amount:          150.60 USD                    ║
+║  💰  Total Amount:          150.60 USD                     ║
 ╚══════════════════════════════════════════════════════════════╝
-💱 Erkannte Währung: USD
+💱 Detected currency: USD
 ```
 
-### TZS Ausgabe
+### TZS Output
 ```
 ╔══════════════════════════════════════════════════════════════╗
 ║                    CRDB Fee Calculator                      ║
 ╠══════════════════════════════════════════════════════════════╣
-║  📊  Fees/Charges:        25000.00 TZS                    ║
-║  🏛️   VAT Total:           5000.00 TZS                    ║
+║  📊  Fees/Charges:        25000.00 TZS                     ║
+║  🏛️   VAT Total:           5000.00 TZS                     ║
 ╠══════════════════════════════════════════════════════════════╣
-║  💰  Total Amount:        30000.00 TZS                    ║
+║  💰  Total Amount:        30000.00 TZS                     ║
 ╚══════════════════════════════════════════════════════════════╝
-💱 Erkannte Währung: TZS
+💱 Detected currency: TZS
 ```
 
-## Deinstallation
+## Uninstallation
 
 ```bash
 chmod +x uninstall.sh
 ./uninstall.sh
 ```
 
-## Unterstützte Dateiformate
+## Supported File Formats
 
 - Excel (.xlsx)
 - Excel (.xls)
 
-## Erkennung von Fees und VAT
+## Detection of Fees and VAT
 
-Das Tool erkennt automatisch:
+The tool automatically detects:
 
 **Fees/Charges:**
 - charge
@@ -119,38 +119,38 @@ Das Tool erkennt automatisch:
 - fund transfer
 
 **VAT:**
-- Alle Einträge mit "vat" im Beschreibungstext
+- All entries with "vat" in the description text
 
-## Währungserkennung
+## Currency Detection
 
-Das Tool erkennt automatisch die Währung aus:
-- Spaltennamen (z.B. "Balance USD", "Amount TZS")
-- Beschreibungstexten (z.B. "Bank Fee USD", "Commission TZS")
-- Währungssymbolen ($, TSH, TZS)
-- Fallback: USD (Standard)
+The tool automatically detects the currency from:
+- Column names (e.g., "Balance USD", "Amount TZS")
+- Description texts (e.g., "Bank Fee USD", "Commission TZS")
+- Currency symbols ($, TSH, TZS)
+- Fallback: USD (default)
 
-**Unterstützte Währungen:**
+**Supported Currencies:**
 - **USD**: US Dollar
 - **TZS**: Tanzania Shilling
 
-## Fehlerbehebung
+## Troubleshooting
 
-### "Datei existiert nicht"
-- Überprüfen Sie den Dateipfad
-- Stellen Sie sicher, dass die Datei im aktuellen Verzeichnis liegt
+### "File does not exist"
+- Check the file path
+- Make sure the file is in the current directory
 
-### "Keine Excel-Datei"
-- Verwenden Sie nur .xlsx oder .xls Dateien
-- Stellen Sie sicher, dass die Datei nicht beschädigt ist
+### "Not an Excel file"
+- Use only .xlsx or .xls files
+- Make sure the file is not corrupted
 
-### "Python nicht gefunden"
-- Installieren Sie Python 3.7 oder höher
-- Stellen Sie sicher, dass `python3` im PATH verfügbar ist
+### "Python not found"
+- Install Python 3.7 or higher
+- Make sure `python3` is available in PATH
 
-## Lizenz
+## License
 
-Siehe [LICENSE](LICENSE) Datei für Details.
+See [LICENSE](LICENSE) file for details.
 
 ## Support
 
-Bei Problemen oder Fragen erstellen Sie bitte ein Issue im Repository.
+For problems or questions, please create an issue in the repository.
