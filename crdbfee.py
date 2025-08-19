@@ -130,11 +130,15 @@ class CRDBFeeCalculator:
     
     def print_results(self, fees_total: float, vat_total: float):
         """Gibt die Ergebnisse in einem schönen Format aus."""
+        total_amount = fees_total + vat_total
+        
         print("╔══════════════════════════════════════════════════════════════╗")
         print("║                    CRDB Fee Calculator                      ║")
         print("╠══════════════════════════════════════════════════════════════╣")
         print(f"║  📊  Fees/Charges: {fees_total:>15.2f} {self.currency:<3}               ║")
         print(f"║  🏛️   VAT Total:    {vat_total:>15.2f} {self.currency:<3}               ║")
+        print("╠══════════════════════════════════════════════════════════════╣")
+        print(f"║  💰  Total Amount:  {total_amount:>15.2f} {self.currency:<3}               ║")
         print("╚══════════════════════════════════════════════════════════════╝")
         print(f"💱 Erkannte Währung: {self.currency}")
 
