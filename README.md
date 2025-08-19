@@ -7,6 +7,7 @@ Ein Kommandozeilen-Tool zur Berechnung von Fees und VAT aus CRDB Kontoauszügen 
 - 🚀 Einfache Kommandozeilen-Bedienung
 - 📊 Automatische Erkennung von Fees/Charges
 - 🏛️ VAT-Berechnung
+- 💱 **Automatische Währungserkennung (USD/TZS)**
 - 💰 Unterstützung für verschiedene Währungen
 - 🎨 Schöne, formatierte Ausgabe
 - 📁 Unterstützt .xlsx und .xls Dateien
@@ -68,6 +69,7 @@ crdbfee --version
 
 ## Beispielausgabe
 
+### USD Ausgabe
 ```
 ╔══════════════════════════════════════════════════════════════╗
 ║                    CRDB Fee Calculator                      ║
@@ -75,6 +77,18 @@ crdbfee --version
 ║  📊  Fees/Charges:          125.50 USD                    ║
 ║  🏛️   VAT Total:             25.10 USD                    ║
 ╚══════════════════════════════════════════════════════════════╝
+💱 Erkannte Währung: USD
+```
+
+### TZS Ausgabe
+```
+╔══════════════════════════════════════════════════════════════╗
+║                    CRDB Fee Calculator                      ║
+╠══════════════════════════════════════════════════════════════╣
+║  📊  Fees/Charges:        25000.00 TZS                    ║
+║  🏛️   VAT Total:           5000.00 TZS                    ║
+╚══════════════════════════════════════════════════════════════╝
+💱 Erkannte Währung: TZS
 ```
 
 ## Deinstallation
@@ -102,6 +116,18 @@ Das Tool erkennt automatisch:
 
 **VAT:**
 - Alle Einträge mit "vat" im Beschreibungstext
+
+## Währungserkennung
+
+Das Tool erkennt automatisch die Währung aus:
+- Spaltennamen (z.B. "Balance USD", "Amount TZS")
+- Beschreibungstexten (z.B. "Bank Fee USD", "Commission TZS")
+- Währungssymbolen ($, TSH, TZS)
+- Fallback: USD (Standard)
+
+**Unterstützte Währungen:**
+- **USD**: US Dollar
+- **TZS**: Tanzania Shilling
 
 ## Fehlerbehebung
 

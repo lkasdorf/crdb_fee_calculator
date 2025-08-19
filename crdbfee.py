@@ -20,6 +20,7 @@ class CRDBFeeCalculator:
     def __init__(self, file_path: str):
         self.file_path = file_path
         self.df = None
+        self.currency = "USD"  # Standardwährung
         
     def find_header_row(self, df: pd.DataFrame) -> int:
         """Findet die Zeile mit den Spaltenüberschriften."""
@@ -42,6 +43,43 @@ class CRDBFeeCalculator:
         except:
             return None
     
+    def detect_currency(self, df: pd.DataFrame) -> str:
+        """Erkennt die Währung aus den Daten."""
+        # Suche nach Währung in den Spaltennamen und ersten Zeilen
+        currency_patterns = {
+            'USD': ['usd', 'dollar', '$', 'us'],
+            'TZS': ['tzs', 'shilling', 'tsh', 'tz']
+        }
+        
+        # Suche in Spaltennamen
+        for col in df.columns:
+            col_lower = str(col).lower()
+            for currency, patterns in currency_patterns.items():
+                if any(pattern in col_lower for pattern in patterns):
+                    return currency
+        
+        # Suche in den ersten Datenzeilen
+        for _, row in df.head(10).iterrows():
+            for cell in row:
+                if pd.notna(cell):
+                    cell_str = str(cell).lower()
+                    for currency, patterns in currency_patterns.items():
+                        if any(pattern in cell_str for pattern in patterns):
+                            return currency
+        
+        # Suche nach spezifischen Währungssymbolen in den Daten
+        for _, row in df.head(20).iterrows():
+            for cell in row:
+                if pd.notna(cell):
+                    cell_str = str(cell)
+                    if '$' in cell_str:
+                        return 'USD'
+                    elif any(symbol in cell_str for symbol in ['TSH', 'TZS', 'Sh']):
+                        return 'TZS'
+        
+        # Fallback: Standardwährung
+        return "USD"
+    
     def load_data(self) -> bool:
         """Lädt und bereitet die Excel-Datei vor."""
         try:
@@ -62,6 +100,9 @@ class CRDBFeeCalculator:
             self.df["Debit"] = self.df["Debit"].apply(self.parse_amount)
             self.df["Credit"] = self.df["Credit"].apply(self.parse_amount)
             self.df["__details_lc"] = self.df["Details"].astype(str).str.lower()
+            
+            # Währung erkennen
+            self.currency = self.detect_currency(self.df)
             
             return True
             
@@ -92,9 +133,10 @@ class CRDBFeeCalculator:
         print("╔══════════════════════════════════════════════════════════════╗")
         print("║                    CRDB Fee Calculator                      ║")
         print("╠══════════════════════════════════════════════════════════════╣")
-        print(f"║  📊  Fees/Charges: {fees_total:>15.2f} USD               ║")
-        print(f"║  🏛️   VAT Total:    {vat_total:>15.2f} USD               ║")
+        print(f"║  📊  Fees/Charges: {fees_total:>15.2f} {self.currency:<3}               ║")
+        print(f"║  🏛️   VAT Total:    {vat_total:>15.2f} {self.currency:<3}               ║")
         print("╚══════════════════════════════════════════════════════════════╝")
+        print(f"💱 Erkannte Währung: {self.currency}")
 
 
 def main():
