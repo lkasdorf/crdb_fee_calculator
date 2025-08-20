@@ -14,7 +14,15 @@ A command line tool for calculating fees and VAT from CRDB account statements in
 
 ## Installation
 
-### Requirements
+### From PyPI (Recommended)
+
+```bash
+pip install crdb-fee-calculator
+```
+
+### From Source
+
+#### Requirements
 
 - Linux system (Ubuntu 22.04+ recommended)
 - Python 3.7 or higher
@@ -33,6 +41,8 @@ A command line tool for calculating fees and VAT from CRDB account statements in
    ```
 
 The tool will be automatically installed in `/usr/local/bin` and will be available from anywhere.
+
+**Note:** This installation method is for development/testing. For production use, install from PyPI.
 
 ### Manual Installation
 
