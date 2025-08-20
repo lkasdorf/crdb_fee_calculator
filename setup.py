@@ -45,7 +45,7 @@ setup(
     install_requires=read_requirements(),
     entry_points={
         "console_scripts": [
-            "crdbfee=crdbfee:main",
+            "crdbfee=crdbfee.calculator:main",
         ],
     },
     include_package_data=True,
