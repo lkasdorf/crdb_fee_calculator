@@ -25,30 +25,59 @@ fi
 
 echo "✅ Python $PYTHON_VERSION gefunden"
 
-# Prüfe ob pip installiert ist
-if ! command -v pip3 &> /dev/null; then
-    echo "❌ pip3 ist nicht installiert. Bitte installieren Sie pip3 zuerst."
-    exit 1
+# Prüfe ob venv verfügbar ist
+if ! python3 -c "import venv" &> /dev/null; then
+    echo "❌ python3-venv ist nicht installiert. Installiere es..."
+    sudo apt update
+    sudo apt install -y python3-venv
 fi
 
-echo "✅ pip3 gefunden"
+echo "✅ python3-venv verfügbar"
+
+# Erstelle virtuelle Umgebung
+VENV_DIR="./venv"
+echo "🔧 Erstelle virtuelle Umgebung in $VENV_DIR..."
+python3 -m venv "$VENV_DIR"
+
+# Aktiviere virtuelle Umgebung
+echo "📦 Aktiviere virtuelle Umgebung und installiere Abhängigkeiten..."
+source "$VENV_DIR/bin/activate"
+
+# Upgrade pip in der virtuellen Umgebung
+pip install --upgrade pip
 
 # Installiere Abhängigkeiten
 echo "📦 Installiere Python-Abhängigkeiten..."
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 
 # Erstelle Installationsverzeichnis
 INSTALL_DIR="/usr/local/bin"
 echo "📁 Installiere in $INSTALL_DIR..."
 
-# Kopiere das Skript
-sudo cp crdbfee.py "$INSTALL_DIR/crdbfee"
+# Erstelle ein Wrapper-Skript, das die virtuelle Umgebung aktiviert
+WRAPPER_SCRIPT="$INSTALL_DIR/crdbfee"
+sudo tee "$WRAPPER_SCRIPT" > /dev/null << EOF
+#!/bin/bash
+# Wrapper für crdbfee mit virtueller Umgebung
+SCRIPT_DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
+VENV_PATH="\$(dirname "\$SCRIPT_DIR")/crdb_fee_calculator/venv"
+if [ -f "\$VENV_PATH/bin/activate" ]; then
+    source "\$VENV_PATH/bin/activate"
+    exec "\$VENV_PATH/bin/python" "\$VENV_PATH/../crdbfee.py" "\$@"
+else
+    echo "❌ Virtuelle Umgebung nicht gefunden. Bitte führen Sie das Installationsskript erneut aus."
+    exit 1
+fi
+EOF
 
 # Mache es ausführbar
-sudo chmod +x "$INSTALL_DIR/crdbfee"
+sudo chmod +x "$WRAPPER_SCRIPT"
+
+# Kopiere das Hauptskript in die virtuelle Umgebung
+cp crdbfee.py "$VENV_DIR/"
 
 # Prüfe ob die Installation erfolgreich war
-if [ -f "$INSTALL_DIR/crdbfee" ]; then
+if [ -f "$WRAPPER_SCRIPT" ]; then
     echo "✅ Installation erfolgreich!"
     echo ""
     echo "🎉 Das crdbfee Tool wurde erfolgreich installiert!"
@@ -58,6 +87,9 @@ if [ -f "$INSTALL_DIR/crdbfee" ]; then
     echo "  crdbfee --help"
     echo ""
     echo "Das Tool ist jetzt von überall verfügbar."
+    echo ""
+    echo "💡 Hinweis: Die virtuelle Umgebung befindet sich in $VENV_DIR"
+    echo "   Löschen Sie diesen Ordner nicht, da das Tool darauf angewiesen ist."
 else
     echo "❌ Installation fehlgeschlagen!"
     exit 1

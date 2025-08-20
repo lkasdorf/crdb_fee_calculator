@@ -16,9 +16,9 @@ A command line tool for calculating fees and VAT from CRDB account statements in
 
 ### Requirements
 
-- Linux system
+- Linux system (Ubuntu 22.04+ recommended)
 - Python 3.7 or higher
-- pip3
+- python3-venv (will be installed automatically)
 
 ### Quick Installation
 
@@ -36,16 +36,24 @@ The tool will be automatically installed in `/usr/local/bin` and will be availab
 
 ### Manual Installation
 
-1. Install dependencies:
+1. Create virtual environment:
    ```bash
-   pip3 install -r requirements.txt
+   python3 -m venv venv
+   source venv/bin/activate
    ```
 
-2. Make script executable and copy to PATH:
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Make script executable and copy to PATH:
    ```bash
    chmod +x crdbfee.py
    sudo cp crdbfee.py /usr/local/bin/crdbfee
    ```
+
+**Note:** The automated installation script is recommended as it handles virtual environment setup automatically.
 
 ## Usage
 
@@ -146,6 +154,11 @@ The tool automatically detects the currency from:
 ### "Python not found"
 - Install Python 3.7 or higher
 - Make sure `python3` is available in PATH
+
+### "externally-managed-environment" Error (Ubuntu 22.04+)
+- This error occurs because Ubuntu prevents system-wide pip installations
+- The installation script automatically creates a virtual environment to solve this
+- If you encounter this error, use the provided `install.sh` script instead of manual pip installation
 
 ## License
 
