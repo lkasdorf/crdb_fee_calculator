@@ -56,16 +56,17 @@ echo "📁 Installiere in $INSTALL_DIR..."
 
 # Erstelle ein Wrapper-Skript, das die virtuelle Umgebung aktiviert
 WRAPPER_SCRIPT="$INSTALL_DIR/crdbfee"
+CURRENT_DIR=$(pwd)
 sudo tee "$WRAPPER_SCRIPT" > /dev/null << EOF
 #!/bin/bash
 # Wrapper für crdbfee mit virtueller Umgebung
-SCRIPT_DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
-VENV_PATH="\$(dirname "\$SCRIPT_DIR")/crdb_fee_calculator/venv"
+VENV_PATH="$CURRENT_DIR/venv"
 if [ -f "\$VENV_PATH/bin/activate" ]; then
     source "\$VENV_PATH/bin/activate"
-    exec "\$VENV_PATH/bin/python" "\$VENV_PATH/../crdbfee.py" "\$@"
+    exec "\$VENV_PATH/bin/python" "\$VENV_PATH/crdbfee.py" "\$@"
 else
-    echo "❌ Virtuelle Umgebung nicht gefunden. Bitte führen Sie das Installationsskript erneut aus."
+    echo "❌ Virtuelle Umgebung nicht gefunden in \$VENV_PATH"
+    echo "Bitte führen Sie das Installationsskript erneut aus."
     exit 1
 fi
 EOF
