@@ -18,7 +18,7 @@ def read_requirements():
 
 setup(
     name="crdb-fee-calculator",
-    version="1.0.1",
+    version="1.0.2",
     author="Leon Kasdorf",
     author_email="crdbfee@dropalias.com",
     description="A command line tool for calculating fees and VAT from CRDB account statements in Excel format",

@@ -186,7 +186,7 @@ Examples:
     parser.add_argument(
         "--version",
         action="version",
-        version="CRDB Fee Calculator v1.0.1"
+        version="CRDB Fee Calculator v1.0.2"
     )
     
     args = parser.parse_args()
